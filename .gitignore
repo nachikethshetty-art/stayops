@@ -12,6 +12,7 @@ frontend/stayops-web/.angular/
 # IDE
 .vs/
 .vscode/
+.claude/
 
 # Test results
 TestResults/

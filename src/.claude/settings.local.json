@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\nachiketh\\\\source\\\\repos\\\\ids 1\" -Recurse -Directory -Force -Depth 1 | Where-Object {$_.Name -in @\\('.github','.git'\\)} | Select-Object FullName)",
-      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\nachiketh\\\\source\\\\repos\\\\ids 1\\\\frontend\\\\stayops-web\\\\src\" -Recurse -File | Where-Object {$_.FullName -notmatch 'node_modules'} | Select-Object -ExpandProperty FullName)",
-      "Artifact"
-    ]
-  }
-}
