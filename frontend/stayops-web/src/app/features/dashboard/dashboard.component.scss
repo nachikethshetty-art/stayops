@@ -1,0 +1,68 @@
+.loading-row {
+  display: flex;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.kpi-card {
+  min-height: 120px;
+}
+
+.kpi-label {
+  font-size: 0.8rem;
+  color: rgba(0, 0, 0, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.kpi-value {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin: 0.25rem 0;
+}
+
+.kpi-value.status-completed {
+  color: #2e7d32;
+}
+
+.kpi-value.status-failed {
+  color: #c62828;
+}
+
+.kpi-value.status-running {
+  color: #f9a825;
+}
+
+.kpi-sub {
+  font-size: 0.75rem;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.lists-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+table {
+  width: 100%;
+}
+
+.empty-state {
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 0.875rem;
+  padding: 0.75rem 0;
+}
+
+@media (max-width: 900px) {
+  .lists-grid {
+    grid-template-columns: 1fr;
+  }
+}

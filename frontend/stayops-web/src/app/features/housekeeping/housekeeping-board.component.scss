@@ -1,0 +1,49 @@
+.loading-row {
+  display: flex;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.board-column {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 8px;
+  padding: 0.75rem;
+  min-height: 200px;
+}
+
+.task-card {
+  margin-bottom: 0.75rem;
+}
+
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.task-notes {
+  font-size: 0.85rem;
+  margin: 0.5rem 0;
+}
+
+.task-time {
+  font-size: 0.7rem;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.empty-column {
+  color: rgba(0, 0, 0, 0.4);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 900px) {
+  .board {
+    grid-template-columns: 1fr;
+  }
+}

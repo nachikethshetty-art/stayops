@@ -1,0 +1,33 @@
+<h1>Housekeeping &amp; Maintenance Board</h1>
+
+@if (loading()) {
+  <div class="loading-row"><mat-spinner diameter="32"></mat-spinner></div>
+} @else {
+  <div class="board">
+    @for (status of statuses; track status) {
+      <div class="board-column">
+        <h3>{{ status }} ({{ tasksByStatus(status).length }})</h3>
+        @for (task of tasksByStatus(status); track task.id) {
+          <mat-card class="task-card">
+            <mat-card-content>
+              <div class="task-header">
+                <strong>Room {{ task.roomNumber }}</strong>
+                <mat-chip>{{ task.taskType }}</mat-chip>
+              </div>
+              <p class="task-notes">{{ task.notes }}</p>
+              <p class="task-time">{{ task.createdAtUtc | date: 'dd MMM, HH:mm' }}</p>
+              @if (status !== 'Completed') {
+                <button mat-stroked-button (click)="advance(task)">
+                  {{ status === 'Pending' ? 'Start' : 'Complete' }}
+                </button>
+              }
+            </mat-card-content>
+          </mat-card>
+        }
+        @if (tasksByStatus(status).length === 0) {
+          <p class="empty-column">No tasks.</p>
+        }
+      </div>
+    }
+  </div>
+}

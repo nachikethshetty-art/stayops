@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem *)",
+      "PowerShell(dotnet tool install *)",
+      "PowerShell(sqlcmd *)",
+      "PowerShell(Get-Content *)",
+      "PowerShell(Invoke-WebRequest -Uri \"http://localhost:4200/\" -UseBasicParsing | Select-Object StatusCode, @{n='Length';e={$_.Content.Length}})",
+      "PowerShell(Get-Process *)",
+      "PowerShell(code \"C:\\\\Users\\\\nachiketh\\\\source\\\\repos\\\\ids 1\")",
+      "PowerShell(Start-Process -FilePath \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\18\\\\Community\\\\Common7\\\\IDE\\\\devenv.exe\" -ArgumentList '\"C:\\\\Users\\\\nachiketh\\\\source\\\\repos\\\\ids 1\\\\StayOps.slnx\"')"
+    ]
+  }
+}

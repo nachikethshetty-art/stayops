@@ -1,0 +1,94 @@
+<div class="admin-grid">
+  <mat-card>
+    <mat-card-header><mat-card-title>Room Types</mat-card-title></mat-card-header>
+    <mat-card-content>
+      <table mat-table [dataSource]="roomTypes()">
+        <ng-container matColumnDef="code"><th mat-header-cell *matHeaderCellDef>Code</th><td mat-cell *matCellDef="let row">{{ row.code }}</td></ng-container>
+        <ng-container matColumnDef="name"><th mat-header-cell *matHeaderCellDef>Name</th><td mat-cell *matCellDef="let row">{{ row.name }}</td></ng-container>
+        <ng-container matColumnDef="baseOccupancy"><th mat-header-cell *matHeaderCellDef>Base Occ.</th><td mat-cell *matCellDef="let row">{{ row.baseOccupancy }}</td></ng-container>
+        <ng-container matColumnDef="maxOccupancy"><th mat-header-cell *matHeaderCellDef>Max Occ.</th><td mat-cell *matCellDef="let row">{{ row.maxOccupancy }}</td></ng-container>
+        <ng-container matColumnDef="roomCount"><th mat-header-cell *matHeaderCellDef>Rooms</th><td mat-cell *matCellDef="let row">{{ row.roomCount }}</td></ng-container>
+        <tr mat-header-row *matHeaderRowDef="roomTypeColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: roomTypeColumns"></tr>
+      </table>
+
+      <form [formGroup]="roomTypeForm" class="inline-form">
+        <mat-form-field appearance="outline"><mat-label>Code</mat-label><input matInput formControlName="code" /></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Name</mat-label><input matInput formControlName="name" /></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Base Occ.</mat-label><input matInput type="number" formControlName="baseOccupancy" /></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Max Occ.</mat-label><input matInput type="number" formControlName="maxOccupancy" /></mat-form-field>
+        <button mat-flat-button color="primary" type="button" (click)="createRoomType()">Add Room Type</button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card>
+    <mat-card-header><mat-card-title>Rooms</mat-card-title></mat-card-header>
+    <mat-card-content>
+      <table mat-table [dataSource]="rooms()">
+        <ng-container matColumnDef="roomNumber"><th mat-header-cell *matHeaderCellDef>Room #</th><td mat-cell *matCellDef="let row">{{ row.roomNumber }}</td></ng-container>
+        <ng-container matColumnDef="roomTypeName"><th mat-header-cell *matHeaderCellDef>Type</th><td mat-cell *matCellDef="let row">{{ row.roomTypeName }}</td></ng-container>
+        <ng-container matColumnDef="floor"><th mat-header-cell *matHeaderCellDef>Floor</th><td mat-cell *matCellDef="let row">{{ row.floor }}</td></ng-container>
+        <ng-container matColumnDef="status"><th mat-header-cell *matHeaderCellDef>Status</th><td mat-cell *matCellDef="let row"><mat-chip>{{ row.status }}</mat-chip></td></ng-container>
+        <tr mat-header-row *matHeaderRowDef="roomColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: roomColumns"></tr>
+      </table>
+
+      <form [formGroup]="roomForm" class="inline-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Room Type</mat-label>
+          <mat-select formControlName="roomTypeId">
+            @for (rt of roomTypes(); track rt.id) { <mat-option [value]="rt.id">{{ rt.name }}</mat-option> }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Room #</mat-label><input matInput formControlName="roomNumber" /></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Floor</mat-label><input matInput formControlName="floor" /></mat-form-field>
+        <button mat-flat-button color="primary" type="button" (click)="createRoom()">Add Room</button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="full-span">
+    <mat-card-header><mat-card-title>Out of Order / Out of Service</mat-card-title></mat-card-header>
+    <mat-card-content>
+      <table mat-table [dataSource]="oosPeriods()">
+        <ng-container matColumnDef="roomNumber"><th mat-header-cell *matHeaderCellDef>Room #</th><td mat-cell *matCellDef="let row">{{ row.roomNumber }}</td></ng-container>
+        <ng-container matColumnDef="type"><th mat-header-cell *matHeaderCellDef>Type</th><td mat-cell *matCellDef="let row">{{ row.type }}</td></ng-container>
+        <ng-container matColumnDef="startDate"><th mat-header-cell *matHeaderCellDef>Start</th><td mat-cell *matCellDef="let row">{{ row.startDate | date: 'dd MMM yyyy' }}</td></ng-container>
+        <ng-container matColumnDef="endDate"><th mat-header-cell *matHeaderCellDef>End</th><td mat-cell *matCellDef="let row">{{ row.endDate | date: 'dd MMM yyyy' }}</td></ng-container>
+        <ng-container matColumnDef="reason"><th mat-header-cell *matHeaderCellDef>Reason</th><td mat-cell *matCellDef="let row">{{ row.reason }}</td></ng-container>
+        <ng-container matColumnDef="status"><th mat-header-cell *matHeaderCellDef>Status</th><td mat-cell *matCellDef="let row"><mat-chip>{{ row.status }}</mat-chip></td></ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let row">
+            @if (row.status === 'Approved') {
+              <button mat-button (click)="returnToService(row)">Return to Service</button>
+            }
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="oosColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: oosColumns"></tr>
+      </table>
+
+      <form [formGroup]="oosForm" class="inline-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Room</mat-label>
+          <mat-select formControlName="roomId">
+            @for (room of rooms(); track room.id) { <mat-option [value]="room.id">{{ room.roomNumber }}</mat-option> }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Type</mat-label>
+          <mat-select formControlName="type">
+            <mat-option value="OutOfOrder">Out of Order</mat-option>
+            <mat-option value="OutOfService">Out of Service</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Start Date</mat-label><input matInput type="date" formControlName="startDate" /></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>End Date</mat-label><input matInput type="date" formControlName="endDate" /></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Reason</mat-label><input matInput formControlName="reason" /></mat-form-field>
+        <button mat-flat-button color="warn" type="button" (click)="setOutOfOrder()">Set Out of Service</button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

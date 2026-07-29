@@ -1,0 +1,155 @@
+<h1>Folio Workspace</h1>
+
+@if (loading()) {
+  <div class="loading-row"><mat-spinner diameter="32"></mat-spinner></div>
+} @else if (folios().length === 0) {
+  <p class="empty-state">No folios exist for this reservation yet (guest must be checked in first).</p>
+} @else {
+  <mat-tab-group>
+    @for (folio of folios(); track folio.id) {
+      <mat-tab [label]="folio.type + ' Folio (' + folio.status + ')'">
+        <div class="tab-content">
+          <div class="balance-row">
+            <span class="balance-label">Balance:</span>
+            <span class="balance-value">&#8377;{{ folio.balance | number: '1.0-2' }}</span>
+            @if (folio.status === 'Open') {
+              <button mat-stroked-button color="primary" (click)="generateInvoice(folio.id)">
+                <mat-icon>receipt</mat-icon> Generate GST Invoice
+              </button>
+            }
+          </div>
+
+          <table mat-table [dataSource]="transactionsByFolio()[folio.id] ?? []" class="transactions-table">
+            <ng-container matColumnDef="createdAtUtc">
+              <th mat-header-cell *matHeaderCellDef>Date</th>
+              <td mat-cell *matCellDef="let row">{{ row.createdAtUtc | date: 'dd MMM, HH:mm' }}</td>
+            </ng-container>
+            <ng-container matColumnDef="type">
+              <th mat-header-cell *matHeaderCellDef>Type</th>
+              <td mat-cell *matCellDef="let row"><mat-chip>{{ row.type }}</mat-chip></td>
+            </ng-container>
+            <ng-container matColumnDef="description">
+              <th mat-header-cell *matHeaderCellDef>Description</th>
+              <td mat-cell *matCellDef="let row">{{ row.description }}</td>
+            </ng-container>
+            <ng-container matColumnDef="amount">
+              <th mat-header-cell *matHeaderCellDef>Amount</th>
+              <td mat-cell *matCellDef="let row">&#8377;{{ row.amount | number: '1.0-2' }}</td>
+            </ng-container>
+            <ng-container matColumnDef="gstAmount">
+              <th mat-header-cell *matHeaderCellDef>GST</th>
+              <td mat-cell *matCellDef="let row">&#8377;{{ row.gstAmount | number: '1.0-2' }}</td>
+            </ng-container>
+            <ng-container matColumnDef="totalAmount">
+              <th mat-header-cell *matHeaderCellDef>Net Effect</th>
+              <td mat-cell *matCellDef="let row">
+                &#8377;{{ row.totalAmount | number: '1.0-2' }}
+                @if (canTransfer() && (row.type === 'RoomCharge' || row.type === 'Incidental') && folio.status === 'Open') {
+                  <button mat-icon-button matTooltip="Transfer to other folio" (click)="transferCharge(folio.id, row)">
+                    <mat-icon>swap_horiz</mat-icon>
+                  </button>
+                }
+              </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="transactionColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: transactionColumns"></tr>
+          </table>
+
+          @if (folio.status === 'Open') {
+            <div class="forms-row">
+              <form [formGroup]="chargeForm" class="charge-form">
+                <h4>Post a charge</h4>
+                <mat-form-field appearance="outline">
+                  <mat-label>Charge type</mat-label>
+                  <mat-select formControlName="chargeType">
+                    <mat-option value="Incidental">Incidental</mat-option>
+                    <mat-option value="RoomCharge">Room Charge</mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>GST category</mat-label>
+                  <mat-select formControlName="chargeCategory">
+                    <mat-option value="FoodAndBeverage">Food &amp; Beverage</mat-option>
+                    <mat-option value="OtherServices">Other Services</mat-option>
+                    <mat-option value="RoomTariff">Room Tariff</mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Description</mat-label>
+                  <input matInput formControlName="description" />
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Amount (excl. GST)</mat-label>
+                  <input matInput type="number" formControlName="taxableAmount" />
+                </mat-form-field>
+                <button mat-flat-button color="primary" type="button" (click)="postCharge(folio.id)">Post Charge</button>
+              </form>
+
+              <form [formGroup]="paymentForm" class="payment-form">
+                <h4>Record a payment</h4>
+                <mat-form-field appearance="outline">
+                  <mat-label>Amount</mat-label>
+                  <input matInput type="number" formControlName="amount" />
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Method</mat-label>
+                  <mat-select formControlName="method">
+                    <mat-option value="Cash">Cash</mat-option>
+                    <mat-option value="Card">Card</mat-option>
+                    <mat-option value="Upi">UPI</mat-option>
+                    <mat-option value="BankTransfer">Bank Transfer</mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <button mat-flat-button color="accent" type="button" (click)="recordPayment(folio.id)">Record Payment</button>
+              </form>
+            </div>
+          }
+        </div>
+      </mat-tab>
+    }
+  </mat-tab-group>
+
+  @if (invoices().length > 0) {
+    <mat-card class="invoices-card">
+      <mat-card-header><mat-card-title>GST Invoices</mat-card-title></mat-card-header>
+      <mat-card-content>
+        @for (invoice of invoices(); track invoice.id) {
+          <div class="invoice-block">
+            <h4>{{ invoice.invoiceNumber }} - {{ invoice.invoiceDate | date: 'dd MMM yyyy' }}</h4>
+            <p>
+              Supplier GSTIN: {{ invoice.supplierGstin }} &middot; Billed to: {{ invoice.billedPartyName }}
+              &middot; {{ invoice.isInterState ? 'Inter-state (IGST)' : 'Intra-state (CGST+SGST)' }}
+            </p>
+            <table class="invoice-lines-table">
+              <thead>
+                <tr>
+                  <th>Description</th>
+                  <th>HSN/SAC</th>
+                  <th>Taxable Value</th>
+                  <th>CGST</th>
+                  <th>SGST</th>
+                  <th>IGST</th>
+                  <th>Line Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (line of invoiceLines()[invoice.id] ?? []; track line.id) {
+                  <tr>
+                    <td>{{ line.description }}</td>
+                    <td>{{ line.hsnSac }}</td>
+                    <td>&#8377;{{ line.taxableValue | number: '1.0-2' }}</td>
+                    <td>&#8377;{{ line.cgstAmount | number: '1.0-2' }} ({{ line.cgstRate }}%)</td>
+                    <td>&#8377;{{ line.sgstAmount | number: '1.0-2' }} ({{ line.sgstRate }}%)</td>
+                    <td>&#8377;{{ line.igstAmount | number: '1.0-2' }} ({{ line.igstRate }}%)</td>
+                    <td>&#8377;{{ line.lineTotal | number: '1.0-2' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+            <p class="invoice-total">Total: &#8377;{{ invoice.totalAmount | number: '1.0-2' }}</p>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+}

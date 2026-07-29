@@ -1,0 +1,53 @@
+.shell-container {
+  height: 100vh;
+}
+
+.shell-sidenav {
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.25rem 1rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.active-link {
+  background: rgba(63, 81, 181, 0.1);
+}
+
+.shell-toolbar {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.toolbar-title {
+  font-weight: 500;
+  margin-right: 1rem;
+}
+
+.hotel-select {
+  max-width: 260px;
+  color: white;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.user-roles-menu-header {
+  padding: 0.25rem 1rem;
+  font-size: 0.75rem;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.shell-content {
+  padding: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}

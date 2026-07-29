@@ -1,0 +1,80 @@
+.loading-row {
+  display: flex;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.empty-state {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.tab-content {
+  padding: 1rem 0;
+}
+
+.balance-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.balance-label {
+  font-size: 0.9rem;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.balance-value {
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.transactions-table {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.forms-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.charge-form,
+.payment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.invoices-card {
+  margin-top: 1.5rem;
+}
+
+.invoice-block {
+  margin-bottom: 1.5rem;
+}
+
+.invoice-lines-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.invoice-lines-table th,
+.invoice-lines-table td {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+}
+
+.invoice-total {
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 900px) {
+  .forms-row {
+    grid-template-columns: 1fr;
+  }
+}

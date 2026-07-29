@@ -1,0 +1,37 @@
+.run-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hint {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.history-card {
+  margin-top: 1rem;
+}
+
+.loading-row {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+table {
+  width: 100%;
+}
+
+.exceptions-block {
+  background: #fff3e0;
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  margin-top: 0.5rem;
+}
+
+.exception-line {
+  font-size: 0.8rem;
+  margin: 0.25rem 0;
+}

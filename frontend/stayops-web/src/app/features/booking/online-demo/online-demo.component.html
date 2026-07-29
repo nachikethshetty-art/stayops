@@ -1,0 +1,116 @@
+<h1>Online Booking Demo</h1>
+<p class="subtitle">Simulates the guest-facing hotel website - no login required. Mock payment adapter only.</p>
+
+@if (!reservation()) {
+  <mat-card>
+    <mat-card-header><mat-card-title>1. Search availability</mat-card-title></mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="searchForm" (ngSubmit)="search()" class="search-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Hotel</mat-label>
+          <select matNativeControl formControlName="hotelId" required>
+            <option value="" disabled>Select a hotel</option>
+            @for (hotel of hotels(); track hotel.id) {
+              <option [value]="hotel.id">{{ hotel.name }}</option>
+            }
+          </select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Check-in</mat-label>
+          <input matInput [matDatepicker]="ci" formControlName="checkInDate" />
+          <mat-datepicker-toggle matSuffix [for]="ci"></mat-datepicker-toggle>
+          <mat-datepicker #ci></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Check-out</mat-label>
+          <input matInput [matDatepicker]="co" formControlName="checkOutDate" />
+          <mat-datepicker-toggle matSuffix [for]="co"></mat-datepicker-toggle>
+          <mat-datepicker #co></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Adults</mat-label>
+          <input matInput type="number" formControlName="adults" min="1" />
+        </mat-form-field>
+
+        <button mat-flat-button color="primary" type="submit" [disabled]="loading()">Search</button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  @if (loading() && results().length === 0) {
+    <div class="loading-row"><mat-spinner diameter="32"></mat-spinner></div>
+  }
+
+  @if (results().length > 0 && !selectedRoomType()) {
+    <mat-card class="section-card">
+      <mat-card-header><mat-card-title>2. Choose a room</mat-card-title></mat-card-header>
+      <mat-card-content class="room-grid">
+        @for (room of results(); track room.roomTypeId) {
+          <mat-card class="room-option" (click)="selectRoomType(room)">
+            <mat-card-content>
+              <h3>{{ room.roomTypeName }}</h3>
+              <p>{{ room.ratePlanName }} &middot; {{ room.mealPlan }}</p>
+              <p class="price">&#8377;{{ room.totalRoomRateExclGst | number: '1.0-2' }} <span>(excl. GST, total stay)</span></p>
+              <p class="avail">{{ room.availableCount }} room(s) left</p>
+            </mat-card-content>
+          </mat-card>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+
+  @if (selectedRoomType() && !hold()) {
+    <mat-card class="section-card">
+      <mat-card-header><mat-card-title>3. Your details - {{ selectedRoomType()?.roomTypeName }}</mat-card-title></mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="guestForm" class="guest-form">
+          <mat-form-field appearance="outline"><mat-label>First name</mat-label><input matInput formControlName="firstName" /></mat-form-field>
+          <mat-form-field appearance="outline"><mat-label>Last name</mat-label><input matInput formControlName="lastName" /></mat-form-field>
+          <mat-form-field appearance="outline"><mat-label>Email</mat-label><input matInput formControlName="email" /></mat-form-field>
+          <mat-form-field appearance="outline"><mat-label>Phone</mat-label><input matInput formControlName="phone" /></mat-form-field>
+          <mat-form-field appearance="outline"><mat-label>ID Proof Type</mat-label><input matInput formControlName="idProofType" /></mat-form-field>
+          <mat-form-field appearance="outline"><mat-label>ID Proof Number</mat-label><input matInput formControlName="idProofNumber" /></mat-form-field>
+          <mat-form-field appearance="outline"><mat-label>City</mat-label><input matInput formControlName="city" /></mat-form-field>
+          <mat-form-field appearance="outline"><mat-label>State Code</mat-label><input matInput formControlName="stateCode" /></mat-form-field>
+        </form>
+        <button mat-flat-button color="primary" (click)="createGuestAndHold()" [disabled]="loading()">
+          @if (loading()) {
+            <mat-spinner diameter="18"></mat-spinner>
+          } @else {
+            Hold this room (10 minutes)
+          }
+        </button>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  @if (hold(); as h) {
+    <mat-card class="section-card">
+      <mat-card-header><mat-card-title>4. Mock payment</mat-card-title></mat-card-header>
+      <mat-card-content>
+        <p>Room held until <strong>{{ h.expiresAtUtc | date: 'medium' }}</strong>. Complete payment before it expires.</p>
+        <p class="price">Amount due: &#8377;{{ selectedRoomType()?.totalRoomRateExclGst | number: '1.0-2' }} (excl. GST)</p>
+        <button mat-flat-button color="accent" (click)="payNow()" [disabled]="paying()">
+          @if (paying()) {
+            <mat-spinner diameter="18"></mat-spinner>
+          } @else {
+            Pay Now (mock gateway)
+          }
+        </button>
+      </mat-card-content>
+    </mat-card>
+  }
+} @else {
+  <mat-card class="section-card confirmation-card">
+    <mat-card-content>
+      <mat-icon class="confirm-icon">check_circle</mat-icon>
+      <h2>Booking confirmed!</h2>
+      <p>Reservation number: <strong>{{ reservation()?.reservationNumber }}</strong></p>
+      <p>Status: {{ reservation()?.status }}</p>
+      <button mat-stroked-button (click)="startOver()">Book another stay</button>
+    </mat-card-content>
+  </mat-card>
+}

@@ -1,0 +1,34 @@
+.date-form {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.loading-row {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.reports-tabs {
+  margin-top: 1rem;
+}
+
+table {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.summary-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding: 1rem 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.empty-state {
+  color: rgba(0, 0, 0, 0.5);
+  padding: 1rem 0;
+}

@@ -1,0 +1,41 @@
+<h1>Refunds</h1>
+
+<mat-card>
+  <mat-card-content>
+    @if (loading()) {
+      <div class="loading-row"><mat-spinner diameter="32"></mat-spinner></div>
+    } @else {
+      <table mat-table [dataSource]="refunds()">
+        <ng-container matColumnDef="requestedAtUtc">
+          <th mat-header-cell *matHeaderCellDef>Requested</th>
+          <td mat-cell *matCellDef="let row">{{ row.requestedAtUtc | date: 'dd MMM yyyy, HH:mm' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="amount">
+          <th mat-header-cell *matHeaderCellDef>Amount</th>
+          <td mat-cell *matCellDef="let row">&#8377;{{ row.amount | number: '1.0-2' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let row"><mat-chip>{{ row.status }}</mat-chip></td>
+        </ng-container>
+        <ng-container matColumnDef="gatewayReference">
+          <th mat-header-cell *matHeaderCellDef>Gateway Ref</th>
+          <td mat-cell *matCellDef="let row">{{ row.gatewayReference ?? '-' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let row">
+            @if (row.status === 'RefundRequested') {
+              <button mat-flat-button color="primary" (click)="approve(row)">Approve &amp; Send to Gateway</button>
+            }
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="columns"></tr>
+        <tr mat-row *matRowDef="let row; columns: columns"></tr>
+      </table>
+      @if (refunds().length === 0) {
+        <p class="empty-state">No refunds for this hotel.</p>
+      }
+    }
+  </mat-card-content>
+</mat-card>

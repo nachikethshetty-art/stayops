@@ -1,0 +1,33 @@
+<mat-card>
+  <mat-card-header><mat-card-title>Guests (server-side paged &amp; filtered)</mat-card-title></mat-card-header>
+  <mat-card-content>
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>Search by name, phone, or email</mat-label>
+      <input matInput [formControl]="searchControl" />
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+
+    @if (loading()) {
+      <div class="loading-row"><mat-spinner diameter="32"></mat-spinner></div>
+    } @else {
+      <table mat-table [dataSource]="guests()">
+        <ng-container matColumnDef="firstName"><th mat-header-cell *matHeaderCellDef>First Name</th><td mat-cell *matCellDef="let row">{{ row.firstName }}</td></ng-container>
+        <ng-container matColumnDef="lastName"><th mat-header-cell *matHeaderCellDef>Last Name</th><td mat-cell *matCellDef="let row">{{ row.lastName }}</td></ng-container>
+        <ng-container matColumnDef="phone"><th mat-header-cell *matHeaderCellDef>Phone</th><td mat-cell *matCellDef="let row">{{ row.phone }}</td></ng-container>
+        <ng-container matColumnDef="email"><th mat-header-cell *matHeaderCellDef>Email</th><td mat-cell *matCellDef="let row">{{ row.email }}</td></ng-container>
+        <ng-container matColumnDef="city"><th mat-header-cell *matHeaderCellDef>City</th><td mat-cell *matCellDef="let row">{{ row.city }}</td></ng-container>
+        <ng-container matColumnDef="stateCode"><th mat-header-cell *matHeaderCellDef>State</th><td mat-cell *matCellDef="let row">{{ row.stateCode }}</td></ng-container>
+        <tr mat-header-row *matHeaderRowDef="columns"></tr>
+        <tr mat-row *matRowDef="let row; columns: columns"></tr>
+      </table>
+
+      <mat-paginator
+        [length]="totalCount()"
+        [pageSize]="10"
+        [pageSizeOptions]="[10, 25, 50]"
+        (page)="onPageChange($event)"
+        showFirstLastButtons
+      ></mat-paginator>
+    }
+  </mat-card-content>
+</mat-card>

@@ -1,0 +1,133 @@
+<h1>Dashboard</h1>
+
+@if (loading()) {
+  <div class="loading-row">
+    <mat-spinner diameter="32"></mat-spinner>
+  </div>
+} @else {
+  <div class="kpi-grid">
+    <mat-card class="kpi-card">
+      <mat-card-content>
+        <div class="kpi-label">Occupancy Today</div>
+        <div class="kpi-value">{{ occupancy()?.occupancyPercent ?? 0 }}%</div>
+        <div class="kpi-sub">{{ occupancy()?.occupiedRooms ?? 0 }} / {{ (occupancy()?.totalActiveRooms ?? 0) - (occupancy()?.outOfOrderRooms ?? 0) }} sellable rooms</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="kpi-card">
+      <mat-card-content>
+        <div class="kpi-label">Arrivals Today</div>
+        <div class="kpi-value">{{ arrivals().length }}</div>
+        <div class="kpi-sub">Confirmed, not yet checked in</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="kpi-card">
+      <mat-card-content>
+        <div class="kpi-label">Departures Today</div>
+        <div class="kpi-value">{{ departures().length }}</div>
+        <div class="kpi-sub">Checked in, due out today</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="kpi-card">
+      <mat-card-content>
+        <div class="kpi-label">OOO / OOS Rooms</div>
+        <div class="kpi-value">{{ oosPeriods().length }}</div>
+        <div class="kpi-sub">{{ oooCount() }} Out of Order</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="kpi-card">
+      <mat-card-content>
+        <div class="kpi-label">Revenue Today (excl. GST)</div>
+        <div class="kpi-value">&#8377;{{ revenue()?.totalTaxableRevenue ?? 0 | number: '1.0-2' }}</div>
+        <div class="kpi-sub">GST collected: &#8377;{{ revenue()?.totalGst ?? 0 | number: '1.0-2' }}</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="kpi-card">
+      <mat-card-content>
+        <div class="kpi-label">Pending Refunds</div>
+        <div class="kpi-value">{{ pendingRefunds().length }}</div>
+        <div class="kpi-sub">
+          <a routerLink="/refunds">Review refunds</a>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="kpi-card">
+      <mat-card-content>
+        <div class="kpi-label">Night Audit Status</div>
+        @if (lastNightAudit(); as run) {
+          <div class="kpi-value status-{{ run.status.toLowerCase() }}">{{ run.status }}</div>
+          <div class="kpi-sub">Business date {{ run.businessDate | date: 'dd MMM yyyy' }}</div>
+        } @else {
+          <div class="kpi-value">-</div>
+          <div class="kpi-sub">No runs yet</div>
+        }
+        <a mat-button routerLink="/night-audit">Open Night Audit</a>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="lists-grid">
+    <mat-card>
+      <mat-card-header><mat-card-title>Arrivals</mat-card-title></mat-card-header>
+      <mat-card-content>
+        <table mat-table [dataSource]="arrivals()" class="mat-elevation-z0">
+          <ng-container matColumnDef="reservationNumber">
+            <th mat-header-cell *matHeaderCellDef>Reservation #</th>
+            <td mat-cell *matCellDef="let row">{{ row.reservationNumber }}</td>
+          </ng-container>
+          <ng-container matColumnDef="guestName">
+            <th mat-header-cell *matHeaderCellDef>Guest</th>
+            <td mat-cell *matCellDef="let row">{{ row.guestName }}</td>
+          </ng-container>
+          <ng-container matColumnDef="roomTypeName">
+            <th mat-header-cell *matHeaderCellDef>Room Type</th>
+            <td mat-cell *matCellDef="let row">{{ row.roomTypeName }}</td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let row">{{ row.status }}</td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="arrivalColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: arrivalColumns"></tr>
+        </table>
+        @if (arrivals().length === 0) {
+          <p class="empty-state">No arrivals today.</p>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header><mat-card-title>Departures</mat-card-title></mat-card-header>
+      <mat-card-content>
+        <table mat-table [dataSource]="departures()" class="mat-elevation-z0">
+          <ng-container matColumnDef="reservationNumber">
+            <th mat-header-cell *matHeaderCellDef>Reservation #</th>
+            <td mat-cell *matCellDef="let row">{{ row.reservationNumber }}</td>
+          </ng-container>
+          <ng-container matColumnDef="guestName">
+            <th mat-header-cell *matHeaderCellDef>Guest</th>
+            <td mat-cell *matCellDef="let row">{{ row.guestName }}</td>
+          </ng-container>
+          <ng-container matColumnDef="roomTypeName">
+            <th mat-header-cell *matHeaderCellDef>Room Type</th>
+            <td mat-cell *matCellDef="let row">{{ row.roomTypeName }}</td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let row">{{ row.status }}</td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="departureColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: departureColumns"></tr>
+        </table>
+        @if (departures().length === 0) {
+          <p class="empty-state">No departures today.</p>
+        }
+      </mat-card-content>
+    </mat-card>
+  </div>
+}

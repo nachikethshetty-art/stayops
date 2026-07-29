@@ -1,0 +1,83 @@
+<h1>Availability &amp; Reception Booking</h1>
+
+<mat-card>
+  <mat-card-content>
+    <form [formGroup]="form" (ngSubmit)="search()" class="search-form">
+      <mat-form-field appearance="outline">
+        <mat-label>Check-in</mat-label>
+        <input matInput [matDatepicker]="checkInPicker" formControlName="checkInDate" [value]="form.value.checkInDate" />
+        <mat-datepicker-toggle matSuffix [for]="checkInPicker"></mat-datepicker-toggle>
+        <mat-datepicker #checkInPicker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Check-out</mat-label>
+        <input matInput [matDatepicker]="checkOutPicker" formControlName="checkOutDate" [value]="form.value.checkOutDate" />
+        <mat-datepicker-toggle matSuffix [for]="checkOutPicker"></mat-datepicker-toggle>
+        <mat-datepicker #checkOutPicker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Adults</mat-label>
+        <input matInput type="number" formControlName="adults" min="1" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Children</mat-label>
+        <input matInput type="number" formControlName="children" min="0" />
+      </mat-form-field>
+
+      <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || loading()">
+        <mat-icon>search</mat-icon>
+        Search
+      </button>
+    </form>
+  </mat-card-content>
+</mat-card>
+
+@if (loading()) {
+  <div class="loading-row"><mat-spinner diameter="32"></mat-spinner></div>
+} @else if (searched()) {
+  <mat-card class="results-card">
+    <mat-card-content>
+      @if (results().length === 0) {
+        <p class="empty-state">No room types available for these dates.</p>
+      } @else {
+        <table mat-table [dataSource]="results()">
+          <ng-container matColumnDef="roomTypeName">
+            <th mat-header-cell *matHeaderCellDef>Room Type</th>
+            <td mat-cell *matCellDef="let row">{{ row.roomTypeName }}</td>
+          </ng-container>
+          <ng-container matColumnDef="mealPlan">
+            <th mat-header-cell *matHeaderCellDef>Meal Plan</th>
+            <td mat-cell *matCellDef="let row">{{ row.mealPlan }}</td>
+          </ng-container>
+          <ng-container matColumnDef="ratePlanName">
+            <th mat-header-cell *matHeaderCellDef>Rate Plan</th>
+            <td mat-cell *matCellDef="let row">{{ row.ratePlanName }} <span class="rate-source">({{ row.rateSource }})</span></td>
+          </ng-container>
+          <ng-container matColumnDef="averageNightlyRate">
+            <th mat-header-cell *matHeaderCellDef>Avg Nightly Rate</th>
+            <td mat-cell *matCellDef="let row">&#8377;{{ row.averageNightlyRate | number: '1.0-2' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="totalRoomRateExclGst">
+            <th mat-header-cell *matHeaderCellDef>Total (excl. GST)</th>
+            <td mat-cell *matCellDef="let row">&#8377;{{ row.totalRoomRateExclGst | number: '1.0-2' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="availableCount">
+            <th mat-header-cell *matHeaderCellDef>Available</th>
+            <td mat-cell *matCellDef="let row">{{ row.availableCount }}</td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let row">
+              <button mat-flat-button color="accent" (click)="book(row)">Book</button>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="columns"></tr>
+          <tr mat-row *matRowDef="let row; columns: columns"></tr>
+        </table>
+      }
+    </mat-card-content>
+  </mat-card>
+}

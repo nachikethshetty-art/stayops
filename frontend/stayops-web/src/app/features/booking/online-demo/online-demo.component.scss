@@ -1,0 +1,71 @@
+.subtitle {
+  color: rgba(0, 0, 0, 0.6);
+  margin-top: -0.5rem;
+}
+
+.search-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.section-card {
+  margin-top: 1rem;
+}
+
+.loading-row {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.room-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.room-option {
+  cursor: pointer;
+  transition: box-shadow 0.15s ease;
+}
+
+.room-option:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.price {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.price span {
+  font-weight: 400;
+  font-size: 0.75rem;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.avail {
+  font-size: 0.8rem;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.guest-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.confirmation-card {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.confirm-icon {
+  font-size: 3rem;
+  height: 3rem;
+  width: 3rem;
+  color: #2e7d32;
+}

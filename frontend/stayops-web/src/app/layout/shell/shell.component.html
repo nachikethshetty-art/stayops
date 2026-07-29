@@ -1,0 +1,53 @@
+<mat-sidenav-container class="shell-container">
+  <mat-sidenav #sidenav mode="side" [opened]="sidenavOpen()" class="shell-sidenav">
+    <div class="brand">
+      <mat-icon>hotel</mat-icon>
+      <span>StayOps India</span>
+    </div>
+    <mat-nav-list>
+      @for (item of navItems(); track item.route) {
+        <a mat-list-item [routerLink]="item.route" routerLinkActive="active-link">
+          <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+          <span matListItemTitle>{{ item.label }}</span>
+        </a>
+      }
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <mat-toolbar color="primary" class="shell-toolbar">
+      <button mat-icon-button (click)="sidenavOpen.set(!sidenavOpen())">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span class="toolbar-title">StayOps India</span>
+
+      @if (hotels().length > 0) {
+        <mat-select class="hotel-select" [ngModel]="selectedHotelId()" (ngModelChange)="onHotelChange($event)">
+          @for (hotel of hotels(); track hotel.id) {
+            <mat-option [value]="hotel.id">{{ hotel.name }} ({{ hotel.code }})</mat-option>
+          }
+        </mat-select>
+      }
+
+      <span class="spacer"></span>
+
+      @if (currentUser(); as user) {
+        <button mat-button [matMenuTriggerFor]="userMenu">
+          <mat-icon>account_circle</mat-icon>
+          {{ user.fullName }}
+        </button>
+        <mat-menu #userMenu="matMenu">
+          <div class="user-roles-menu-header">{{ user.roles.join(', ') }}</div>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Logout</span>
+          </button>
+        </mat-menu>
+      }
+    </mat-toolbar>
+
+    <div class="shell-content">
+      <router-outlet />
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

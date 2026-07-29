@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/StayOps.Api/StayOps.Api.csproj" />
+    <Project Path="src/StayOps.Application/StayOps.Application.csproj" />
+    <Project Path="src/StayOps.Domain/StayOps.Domain.csproj" />
+    <Project Path="src/StayOps.Infrastructure/StayOps.Infrastructure.csproj" />
+    <Project Path="src/StayOps.Tests/StayOps.Tests.csproj" />
+  </Folder>
+</Solution>

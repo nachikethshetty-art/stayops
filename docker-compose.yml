@@ -1,0 +1,47 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: stayops-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "StayOps#India2026!"
+      MSSQL_PID: "Express"
+    ports:
+      - "1433:1433"
+    volumes:
+      - stayops-sqldata:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  api:
+    build:
+      context: .
+      dockerfile: src/StayOps.Api/Dockerfile
+    container_name: stayops-api
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=StayOpsIndiaDb;User Id=sa;Password=StayOps#India2026!;TrustServerCertificate=True;MultipleActiveResultSets=true"
+      Jwt__SigningKey: "StayOps-India-Demo-Signing-Key-Do-Not-Use-In-Production-2026!"
+      Cors__AllowedOrigins__0: "http://localhost:4200"
+    ports:
+      - "8080:8080"
+
+  web:
+    build:
+      context: frontend/stayops-web
+      dockerfile: Dockerfile
+    container_name: stayops-web
+    depends_on:
+      - api
+    ports:
+      - "4200:80"
+
+volumes:
+  stayops-sqldata:

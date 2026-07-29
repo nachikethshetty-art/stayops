@@ -1,0 +1,61 @@
+<mat-card>
+  <mat-card-header><mat-card-title>Cancellation Policies</mat-card-title></mat-card-header>
+  <mat-card-content>
+    <form [formGroup]="policyForm" class="inline-form">
+      <mat-form-field appearance="outline"><mat-label>Policy name</mat-label><input matInput formControlName="name" /></mat-form-field>
+      <button mat-flat-button color="primary" type="button" (click)="createPolicy()">Add Policy</button>
+    </form>
+  </mat-card-content>
+</mat-card>
+
+@for (policy of policies(); track policy.id) {
+  <mat-card class="policy-card">
+    <mat-card-header><mat-card-title>{{ policy.name }}</mat-card-title></mat-card-header>
+    <mat-card-content>
+      <table mat-table [dataSource]="policy.rules">
+        <ng-container matColumnDef="hoursBeforeCheckInMin"><th mat-header-cell *matHeaderCellDef>Min Hrs</th><td mat-cell *matCellDef="let row">{{ row.hoursBeforeCheckInMin ?? '-' }}</td></ng-container>
+        <ng-container matColumnDef="hoursBeforeCheckInMax"><th mat-header-cell *matHeaderCellDef>Max Hrs</th><td mat-cell *matCellDef="let row">{{ row.hoursBeforeCheckInMax ?? '-' }}</td></ng-container>
+        <ng-container matColumnDef="penaltyType"><th mat-header-cell *matHeaderCellDef>Penalty</th><td mat-cell *matCellDef="let row">{{ row.penaltyType }}</td></ng-container>
+        <ng-container matColumnDef="penaltyValue"><th mat-header-cell *matHeaderCellDef>Value</th><td mat-cell *matCellDef="let row">{{ row.penaltyValue ?? '-' }}</td></ng-container>
+        <ng-container matColumnDef="appliesToNoShow"><th mat-header-cell *matHeaderCellDef>No-Show?</th><td mat-cell *matCellDef="let row">{{ row.appliesToNoShow ? 'Yes' : 'No' }}</td></ng-container>
+        <ng-container matColumnDef="description"><th mat-header-cell *matHeaderCellDef>Description</th><td mat-cell *matCellDef="let row">{{ row.description }}</td></ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let row"><button mat-icon-button (click)="deleteRule(policy.id, row.id)"><mat-icon>delete</mat-icon></button></td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="ruleColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: ruleColumns"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+}
+
+<mat-card class="policy-card">
+  <mat-card-header><mat-card-title>Add Rule</mat-card-title></mat-card-header>
+  <mat-card-content>
+    <form [formGroup]="ruleForm" class="inline-form">
+      <mat-form-field appearance="outline">
+        <mat-label>Policy</mat-label>
+        <mat-select formControlName="policyId">
+          @for (p of policies(); track p.id) { <mat-option [value]="p.id">{{ p.name }}</mat-option> }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Min Hours Before Check-in</mat-label><input matInput type="number" formControlName="hoursBeforeCheckInMin" /></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Max Hours Before Check-in</mat-label><input matInput type="number" formControlName="hoursBeforeCheckInMax" /></mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Penalty Type</mat-label>
+        <mat-select formControlName="penaltyType">
+          <mat-option value="NoPenalty">No Penalty</mat-option>
+          <mat-option value="OneNightPenalty">One Night Penalty</mat-option>
+          <mat-option value="PercentageOfStay">Percentage of Stay</mat-option>
+          <mat-option value="FullStayPenalty">Full Stay Penalty</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Penalty Value (%)</mat-label><input matInput type="number" formControlName="penaltyValue" /></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Sort Order</mat-label><input matInput type="number" formControlName="sortOrder" /></mat-form-field>
+      <mat-checkbox formControlName="appliesToNoShow">Applies to No-Show</mat-checkbox>
+      <mat-form-field appearance="outline" class="wide-field"><mat-label>Description</mat-label><input matInput formControlName="description" /></mat-form-field>
+      <button mat-flat-button color="primary" type="button" (click)="addRule()">Add Rule</button>
+    </form>
+  </mat-card-content>
+</mat-card>

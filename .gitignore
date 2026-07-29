@@ -1,0 +1,17 @@
+# .NET
+bin/
+obj/
+*.user
+logs/
+
+# Angular / Node
+frontend/stayops-web/node_modules/
+frontend/stayops-web/dist/
+frontend/stayops-web/.angular/
+
+# IDE
+.vs/
+.vscode/
+
+# Test results
+TestResults/

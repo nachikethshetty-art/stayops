@@ -1,0 +1,11 @@
+/* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+h1 { font-size: 1.5rem; font-weight: 500; margin: 0 0 1rem; }
+
+.notification-success { --mdc-snackbar-container-color: #2e7d32; --mdc-snackbar-supporting-text-color: white; }
+.notification-error { --mdc-snackbar-container-color: #c62828; --mdc-snackbar-supporting-text-color: white; }
+
+mat-card { margin-bottom: 1rem; }
