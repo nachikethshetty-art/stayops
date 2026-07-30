@@ -1,5 +1,6 @@
 using System.Data;
 using Dapper;
+using Microsoft.EntityFrameworkCore;
 using StayOps.Application.Common.Exceptions;
 using StayOps.Application.Common.Interfaces;
 using StayOps.Application.NightAudit;
@@ -22,11 +23,39 @@ internal class NightAuditRunRow
     public int ExceptionCount { get; set; }
 }
 
-public class NightAuditService(IDapperConnectionFactory connectionFactory) : Application.NightAudit.INightAuditService
+public class NightAuditService(IDapperConnectionFactory connectionFactory, IApplicationDbContext db) : Application.NightAudit.INightAuditService
 {
+    /// <summary>Night audit is a once-a-night operation - even a hotel that's legitimately catching up on a backlog shouldn't be able to fire runs back-to-back.</summary>
+    private static readonly TimeSpan MinIntervalBetweenRuns = TimeSpan.FromHours(5);
+
     public async Task<NightAuditRunDto> RunAsync(Guid hotelId, Guid? triggeredByUserId, CancellationToken ct = default)
     {
+        var hotel = await db.Hotels.Where(h => h.Id == hotelId)
+            .Select(h => new { h.TimeZoneId, h.BusinessDate })
+            .FirstOrDefaultAsync(ct)
+            ?? throw new NotFoundException("Hotel", hotelId);
+
+        var todayLocal = ResolveTodayLocal(hotel.TimeZoneId);
+        if (hotel.BusinessDate > todayLocal)
+        {
+            throw new BusinessRuleException(
+                $"Night audit cannot be run for business date {hotel.BusinessDate:yyyy-MM-dd} - that date has not started yet in the hotel's local time (today is {todayLocal:yyyy-MM-dd}).");
+        }
+
         using var connection = connectionFactory.CreateConnection();
+
+        var lastCompletedAtUtc = await connection.QuerySingleOrDefaultAsync<DateTime?>(
+            new CommandDefinition(
+                "SELECT MAX(CompletedAtUtc) FROM dbo.NightAuditRuns WHERE HotelId = @HotelId AND Status = 1 /* Completed */",
+                new { HotelId = hotelId }, cancellationToken: ct));
+
+        if (lastCompletedAtUtc is { } lastRunAtUtc && DateTime.UtcNow - lastRunAtUtc < MinIntervalBetweenRuns)
+        {
+            var retryAfterUtc = lastRunAtUtc + MinIntervalBetweenRuns;
+            throw new BusinessRuleException(
+                $"Night audit last completed at {lastRunAtUtc:yyyy-MM-dd HH:mm} UTC. It can be run again after {retryAfterUtc:yyyy-MM-dd HH:mm} UTC.");
+        }
+
         var parameters = new DynamicParameters();
         parameters.Add("HotelId", hotelId);
         parameters.Add("TriggeredByUserId", triggeredByUserId);
@@ -41,6 +70,21 @@ public class NightAuditService(IDapperConnectionFactory connectionFactory) : App
         {
             throw new BusinessRuleException(ex.Message);
         }
+    }
+
+    private static DateOnly ResolveTodayLocal(string timeZoneId)
+    {
+        TimeZoneInfo tz;
+        try
+        {
+            tz = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+        }
+        catch (TimeZoneNotFoundException)
+        {
+            tz = TimeZoneInfo.Utc;
+        }
+
+        return DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, tz));
     }
 
     public async Task<IReadOnlyList<NightAuditRunDto>> GetHistoryAsync(Guid hotelId, CancellationToken ct = default)

@@ -2,7 +2,7 @@
 
 <mat-card>
   <mat-card-content class="run-row">
-    <button mat-flat-button color="primary" (click)="runNightAudit()" [disabled]="running()">
+    <button mat-flat-button color="primary" (click)="runNightAudit()" [disabled]="running() || blockReason() !== null" [matTooltip]="blockReason() ?? ''">
       @if (running()) {
         <mat-spinner diameter="18"></mat-spinner>
       } @else {
@@ -15,6 +15,9 @@
       Posts room charges for every checked-in stay, detects no-shows, and advances the hotel's business date.
       Repeat-safe: re-running after a failure resumes from where it left off.
     </p>
+    @if (blockReason(); as reason) {
+      <p class="block-reason">{{ reason }}</p>
+    }
   </mat-card-content>
 </mat-card>
 
