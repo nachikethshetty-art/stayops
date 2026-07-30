@@ -14,7 +14,9 @@ import { MatTableModule } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Folio } from '../../../core/models/billing.models';
 import { Room } from '../../../core/models/hotel.models';
+import { ROLES } from '../../../core/models/auth.models';
 import { CancellationResult, Reservation, ReservationNightRate } from '../../../core/models/reservation.models';
+import { AuthService } from '../../../core/services/auth.service';
 import { FolioService } from '../../../core/services/folio.service';
 import { HotelService } from '../../../core/services/hotel.service';
 import { NotificationService } from '../../../core/services/notification.service';
@@ -51,6 +53,9 @@ export class ReservationDetailComponent implements OnInit {
 
   private reservationId!: string;
 
+  /** Stay-mutating actions (check-in/out, cancel, no-show, move-room) are reception/management only - see ReservationsController. */
+  readonly canManageStay: boolean;
+
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
@@ -58,8 +63,11 @@ export class ReservationDetailComponent implements OnInit {
     private readonly hotelService: HotelService,
     private readonly folioService: FolioService,
     private readonly notifications: NotificationService,
-    private readonly dialog: MatDialog
-  ) {}
+    private readonly dialog: MatDialog,
+    private readonly auth: AuthService
+  ) {
+    this.canManageStay = this.auth.hasAnyRole(ROLES.SuperAdmin, ROLES.HotelManager, ROLES.Receptionist);
+  }
 
   ngOnInit(): void {
     this.reservationId = this.route.snapshot.paramMap.get('id')!;

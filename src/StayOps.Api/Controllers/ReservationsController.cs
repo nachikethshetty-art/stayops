@@ -39,11 +39,13 @@ public class ReservationsController(
     }
 
     [HttpGet("api/v1/hotels/{hotelId:guid}/reservations")]
+    [Authorize(Roles = $"{Roles.SuperAdmin},{Roles.HotelManager},{Roles.Receptionist},{Roles.FinanceUser}")]
     public async Task<ActionResult<IReadOnlyList<ReservationListItemDto>>> GetByHotel(
         Guid hotelId, [FromQuery] DateOnly? checkInDate, [FromQuery] DateOnly? checkOutDate, CancellationToken ct)
         => Ok(await service.GetByHotelAsync(hotelId, checkInDate, checkOutDate, ct));
 
     [HttpGet("api/v1/reservations/{id:guid}")]
+    [Authorize(Roles = $"{Roles.SuperAdmin},{Roles.HotelManager},{Roles.Receptionist},{Roles.FinanceUser}")]
     public async Task<ActionResult<ReservationDto>> GetById(Guid id, CancellationToken ct)
     {
         var result = await service.GetByIdAsync(id, ct);
@@ -58,6 +60,7 @@ public class ReservationsController(
     }
 
     [HttpGet("api/v1/reservations/{id:guid}/night-rates")]
+    [Authorize(Roles = $"{Roles.SuperAdmin},{Roles.HotelManager},{Roles.Receptionist},{Roles.FinanceUser}")]
     public async Task<ActionResult<IReadOnlyList<ReservationNightRateDto>>> GetNightRates(Guid id, CancellationToken ct)
     {
         var reservation = await service.GetByIdAsync(id, ct);
@@ -83,6 +86,7 @@ public class ReservationsController(
         => Ok(await cancellationService.MarkNoShowAsync(id, request.Reason, CurrentUserId, ct));
 
     [HttpGet("api/v1/reservations/{id:guid}/cancellation")]
+    [Authorize(Roles = $"{Roles.SuperAdmin},{Roles.HotelManager},{Roles.Receptionist},{Roles.FinanceUser}")]
     public async Task<ActionResult<CancellationDto>> GetCancellation(Guid id, CancellationToken ct)
     {
         var result = await cancellationService.GetByReservationIdAsync(id, ct);

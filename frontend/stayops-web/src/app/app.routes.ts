@@ -15,11 +15,31 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', loadComponent: () => import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent) },
-      { path: 'booking/availability', loadComponent: () => import('./features/booking/availability/availability.component').then((m) => m.AvailabilityComponent) },
+      {
+        path: 'booking/availability',
+        loadComponent: () => import('./features/booking/availability/availability.component').then((m) => m.AvailabilityComponent),
+        canActivate: [roleGuard],
+        data: { roles: [ROLES.SuperAdmin, ROLES.HotelManager, ROLES.Receptionist] }
+      },
       { path: 'booking/online-demo', loadComponent: () => import('./features/booking/online-demo/online-demo.component').then((m) => m.OnlineDemoComponent) },
-      { path: 'reservations', loadComponent: () => import('./features/reservations/list/reservations-list.component').then((m) => m.ReservationsListComponent) },
-      { path: 'reservations/:id', loadComponent: () => import('./features/reservations/detail/reservation-detail.component').then((m) => m.ReservationDetailComponent) },
-      { path: 'reservations/:id/folios', loadComponent: () => import('./features/folios/folio-workspace.component').then((m) => m.FolioWorkspaceComponent) },
+      {
+        path: 'reservations',
+        loadComponent: () => import('./features/reservations/list/reservations-list.component').then((m) => m.ReservationsListComponent),
+        canActivate: [roleGuard],
+        data: { roles: [ROLES.SuperAdmin, ROLES.HotelManager, ROLES.Receptionist, ROLES.FinanceUser] }
+      },
+      {
+        path: 'reservations/:id',
+        loadComponent: () => import('./features/reservations/detail/reservation-detail.component').then((m) => m.ReservationDetailComponent),
+        canActivate: [roleGuard],
+        data: { roles: [ROLES.SuperAdmin, ROLES.HotelManager, ROLES.Receptionist, ROLES.FinanceUser] }
+      },
+      {
+        path: 'reservations/:id/folios',
+        loadComponent: () => import('./features/folios/folio-workspace.component').then((m) => m.FolioWorkspaceComponent),
+        canActivate: [roleGuard],
+        data: { roles: [ROLES.SuperAdmin, ROLES.HotelManager, ROLES.Receptionist, ROLES.FinanceUser] }
+      },
       {
         path: 'housekeeping',
         loadComponent: () => import('./features/housekeeping/housekeeping-board.component').then((m) => m.HousekeepingBoardComponent),

@@ -19,7 +19,7 @@
 
         <mat-divider></mat-divider>
         <div class="actions-row">
-          @if (res.status === 'Confirmed') {
+          @if (canManageStay && res.status === 'Confirmed') {
             <button mat-flat-button color="primary" (click)="checkIn()">
               <mat-icon>login</mat-icon> Check In
             </button>
@@ -27,10 +27,12 @@
             <button mat-stroked-button (click)="markNoShow()">Mark No-Show</button>
           }
           @if (res.status === 'CheckedIn') {
-            <button mat-flat-button color="primary" (click)="checkOut()">
-              <mat-icon>logout</mat-icon> Check Out
-            </button>
-            <button mat-stroked-button (click)="moveRoom()">Move Room</button>
+            @if (canManageStay) {
+              <button mat-flat-button color="primary" (click)="checkOut()">
+                <mat-icon>logout</mat-icon> Check Out
+              </button>
+              <button mat-stroked-button (click)="moveRoom()">Move Room</button>
+            }
             <button mat-stroked-button (click)="goToFolio()">
               <mat-icon>receipt_long</mat-icon> Folio Workspace
             </button>

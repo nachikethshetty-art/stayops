@@ -55,9 +55,9 @@ export class ShellComponent implements OnInit {
     const roles = this.auth.roles();
     const items: NavItem[] = [
       { label: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
-      { label: 'Availability & Booking', icon: 'event_available', route: '/booking/availability' },
+      { label: 'Availability & Booking', icon: 'event_available', route: '/booking/availability', roles: [ROLES.SuperAdmin, ROLES.HotelManager, ROLES.Receptionist] },
       { label: 'Online Booking Demo', icon: 'shopping_cart', route: '/booking/online-demo' },
-      { label: 'Reservations', icon: 'book_online', route: '/reservations' },
+      { label: 'Reservations', icon: 'book_online', route: '/reservations', roles: [ROLES.SuperAdmin, ROLES.HotelManager, ROLES.Receptionist, ROLES.FinanceUser] },
       { label: 'Housekeeping', icon: 'cleaning_services', route: '/housekeeping', roles: [ROLES.SuperAdmin, ROLES.HotelManager, ROLES.Housekeeper, ROLES.Receptionist] },
       { label: 'Night Audit', icon: 'nightlight', route: '/night-audit', roles: [ROLES.SuperAdmin, ROLES.HotelManager, ROLES.FinanceUser] },
       { label: 'Reports', icon: 'bar_chart', route: '/reports', roles: [ROLES.SuperAdmin, ROLES.HotelManager, ROLES.FinanceUser] },
